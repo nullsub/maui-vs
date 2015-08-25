@@ -93,7 +93,7 @@ class VSOutput(object):
         else:
             raise TypeError("Unsupported data type.")
 
-        self.__omit = omit_if_possible
+        self.__omit = True and omit_if_possible
 
         for f in self.__fields:
             print f.d.keys()
