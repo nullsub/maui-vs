@@ -6,6 +6,7 @@ __author__ = 'christoph.statz <at> tu-dresden.de'
 
 import numpy as np
 from .helper import *
+import kv
 
 import argparse
 parser = argparse.ArgumentParser("maui-vs")
@@ -30,6 +31,8 @@ class VSWriter(object):
         self.__var_unit = var_unit
         self.__local_only = local_only
 
+	#self.kv_data
+
     def write(self, base, base_name=""):
 
         mesh_groups = dict()
@@ -53,9 +56,13 @@ class VSWriter(object):
             mesh_group = safe_create_group(var_group, "mesh")
 
             # Add mesh attributes.
-            mesh_group.attrs["vsType"] = np.string_("mesh")
-            mesh_group.attrs["vsKind"] = np.string_("rectilinear")
-            mesh_group.attrs["vsMD"] = np.string_(self.__name + "mesh")
+          #  mesh_group.attrs["vsType"] = np.string_("mesh")
+            kv.set_attrs(mesh_group.name, "vsType", "mesh");
+
+            #mesh_group.attrs["vsKind"] = np.string_("rectilinear")
+            kv.set_attrs(mesh_group.name, "vsKind", "rectilinear");
+            #mesh_group.attrs["vsMD"] = np.string_(self.__name + "mesh")
+            kv.set_attrs(mesh_group.name, "vsMD", self.__name + "mesh");
 
             data_shape = []
 
@@ -64,7 +71,8 @@ class VSWriter(object):
                     data_shape.append(len(md))
 
             for i in range(len(md)):
-                mesh_group.attrs["vsAxis"+str(i)] = np.string_("axis"+str(i))
+                #mesh_group.attrs["vsAxis"+str(i)] = np.string_("axis"+str(i))
+                kv.set_attrs(mesh_group.name, "vsType"+str(i), "axis"+str(i));
                 safe_create_dataset(mesh_group, "axis"+str(i), shape=(md[i].stop-md[i].start,), dtype='float64')
                 data_shape.append(md[i].stop-md[i].start)
 
@@ -72,18 +80,23 @@ class VSWriter(object):
             mesh_groups[key] = mesh_group
             test = safe_create_dataset(var_group, self.__name, shape=tuple(data_shape), dtype='float64')
 
-            test.attrs["vsType"] = np.string_('variable')
-            test.attrs["vsMesh"] = np.string_('/'+base_name+'/mesh')
+            #test.attrs["vsType"] = np.string_('variable')
+            kv.set_attrs(test.name, "vsType", "variable");
+            #test.attrs["vsMesh"] = np.string_('/'+base_name+'/mesh')
+            kv.set_attrs(test.name, "vsMesh", '/'+base_name+'/mesh')
             if self.__var_unit is not None:
-                test.attrs["vsUnits"] = np.string_(self.__var_unit)
+                #test.attrs["vsUnits"] = np.string_(self.__var_unit)
+                kv.set_attrs(test.name, "vsUnits", self.__var_unit);
 
             if self.__type > 0:
 
-                test.attrs["vsIndexOrder"] = np.string_("compMajorC")
+                #test.attrs["vsIndexOrder"] = np.string_("compMajorC")
+                kv.set_attrs(test.name, "vsIndexOrder", "compMajorC");
 
                 if self.__type < 2:
                     derived_vars = safe_create_group(base, "derived_vars")
-                    derived_vars.attrs["vsType"] = np.string_("vsVars")
+                    #derived_vars.attrs["vsType"] = np.string_("vsVars")
+                    kv.set_attrs(derived.name, "vsType", "vsVars");
 
                     tmp = "{"
                     for i in range(len(md)):
@@ -91,12 +104,15 @@ class VSWriter(object):
                         if i < len(md)**self.__type-1:
                             tmp += ", "
                     tmp += "}"
-                    derived_vars.attrs[self.__name] = np.string_(tmp)
+                    #derived_vars.attrs[self.__name] = np.string_(tmp)
+                    kv.set_attrs(derived.name, self.__name, tmp)
 
             if 'time' in base:
-                test.attrs["vsTimeGroup"] = np.string_("/time")
+                #test.attrs["vsTimeGroup"] = np.string_("/time")
+                kv.set_attrs(test.name, "vsTimeGroup", "/time");
 
-            test.attrs["vsMD"] = np.string_(self.__name)
+            #test.attrs["vsMD"] = np.string_(self.__name)
+            kv.set_attrs(test.name, "vsMD", self.__name);
             datasets[key] = test
 
         # Create Mesh Groups/Datasets
