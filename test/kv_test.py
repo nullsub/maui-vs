@@ -4,11 +4,10 @@ from __future__ import division
 
 import sys
 
-import kv as k
+import kv
 import numpy as np
 #import h5py as h5
 
-kv = k.kv_store()
 str = np.string_("time")
 print("string is " + str)
 kv.print_kv()

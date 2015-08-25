@@ -12,22 +12,24 @@ args, _ = parser.parse_known_args()
 
 spacename="kv"
 print("connecting to coordinator: " + args.kv_coordinator)
-self.admin = hyperdex.admin.Admin(args.kv_coordinator, 1982)
-self.client = hyperdex.client.Client(args.kv_coordinator, 1982)
-print(self.admin.list_spaces())
+admin = hyperdex.admin.Admin(args.kv_coordinator, 1982)
+client = hyperdex.client.Client(args.kv_coordinator, 1982)
+print(admin.list_spaces())
 
 #class kv_store:
 #	def __init__(self):
 def set_attrs(group_name, name, value):
 	key = str(group_name) + "/" + str(name)
 	print("storing: key: " + key + ", val: " + str(value))
-	self.client.put(self.spacename, key, {'value': str(value)})
+	client.put(spacename, key, {'value': str(value)})
+
+def flush(hdf5_file):
+	print("flushing metadata to file")
+	for x in client.search(spacename, {}):
+		print x			
 
 def print_kv():
 	print("getting kv_data:")
-	for x in self.client.search(self.spacename, {}):
+	for x in client.search(spacename, {}):
 		print x			
 
-def finish():
-	print("saving in hdf5")
-		

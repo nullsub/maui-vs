@@ -174,6 +174,8 @@ class VSOutput(object):
             for writer in self.__writer:
                 writer.write(base, base_name)
 
+
+            kv.flush(base)
             base.close()
 
 
