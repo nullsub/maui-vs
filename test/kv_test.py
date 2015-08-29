@@ -5,13 +5,14 @@ from __future__ import division
 import sys
 
 import kv
-import numpy as np
-#import h5py as h5
+import h5py as h5
 
-str = np.string_("time")
-print("string is " + str)
+base = h5.File("file"+'.vsh5', 'w', driver='sec2')
+a_group = h5.Group.create_group(base, "time")
+kv.set_attrs(a_group.name, "vsType", str.encode("utf8"))
+kv.set_attrs(a_group.name, "vsType1", str.encode("utf8"))
+a_group = h5.Group.create_group(base, "time1")
+kv.set_attrs(a_group.name, "vsType", str.encode("utf8"))
+kv.set_attrs(a_group.name, "vsType1", str.encode("utf8"))
 kv.print_kv()
-kv.set_attrs("/time/", "vsType", str.encode("utf8"))
-kv.set_attrs("/time/", "vsType1", str.encode("utf8"))
-kv.set_attrs("/time1/", "vsType", str.encode("utf8"))
-kv.print_kv()
+kv.flush(base)
