@@ -20,9 +20,9 @@ import numpy as np
 
 from maui.backend import context
 
-import kv 
+import mpi4py.MPI as MPI
 
-#kv = k.kv_store()
+import kv 
 
 def write_time(base, cycle, time):
 
@@ -96,7 +96,7 @@ class VSOutput(object):
         self.__omit = True and omit_if_possible
 
         for f in self.__fields:
-            print f.d.keys()
+            #print f.d.keys()
             if len(f.d.keys()) > 0:
                 self.__omit = False
 
@@ -173,9 +173,13 @@ class VSOutput(object):
 
             for writer in self.__writer:
                 writer.write(base, base_name)
-
-
+  
+            MPI.COMM_WORLD.Barrier()
             kv.flush(base)
+            MPI.COMM_WORLD.Barrier()
+            if(context.rank == 0):
+                kv.clear()
+            print("flush fertig")
             base.close()
-
-
+            print("datei geschlossen")
+            MPI.COMM_WORLD.Barrier()
