@@ -1,6 +1,8 @@
 #!/bin/sh
 module purge
 module load /lustre/scratch2/p_roscon_pub/modules/modulefiles/python-extras/20150821
+#module load gcc/4.7.1
+#module load bullxmpi/1.2.8.4
 export PYTHONPATH=/home/s3066193/.local/lib/python2.7/site-packages
 
 COORDINATOR_ID=`cat /lustre/scratch2/s3066193/hyperdexdata/coordinator_id`

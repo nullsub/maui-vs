@@ -20,8 +20,6 @@ import numpy as np
 
 from maui.backend import context
 
-import mpi4py.MPI as MPI
-
 import kv 
 
 def write_time(base, cycle, time):
@@ -45,7 +43,6 @@ def write_time(base, cycle, time):
 def write_provenance_data(h5file):
 
         run_info = safe_create_group(h5file, "runinfo")
-
         #run_info.attrs["vsType"] = np.string_("runInfo")
 	kv.set_attrs(run_info.name, "vsType", "runInfo");
         #run_info.attrs["vsSoftware"] = np.string_("maui")
@@ -174,12 +171,7 @@ class VSOutput(object):
             for writer in self.__writer:
                 writer.write(base, base_name)
   
-            MPI.COMM_WORLD.Barrier()
-            kv.flush(base)
-            MPI.COMM_WORLD.Barrier()
-            if(context.rank == 0):
-                kv.clear()
-            print("flush fertig")
             base.close()
-            print("datei geschlossen")
-            MPI.COMM_WORLD.Barrier()
+            if(context.rank == 0):
+                base = h5.File(filename+'.vsh5', 'r+', driver='sec2')
+		kv.finalize(base)
