@@ -31,8 +31,6 @@ class VSWriter(object):
         self.__var_unit = var_unit
         self.__local_only = local_only
 
-	#self.kv_data
-
     def write(self, base, base_name=""):
 
         mesh_groups = dict()
@@ -72,7 +70,7 @@ class VSWriter(object):
 
             for i in range(len(md)):
                 #mesh_group.attrs["vsAxis"+str(i)] = np.string_("axis"+str(i))
-                kv.set_attrs(mesh_group.name, "vsType"+str(i), "axis"+str(i));
+                kv.set_attrs(mesh_group.name, "vsAxis"+str(i), "axis"+str(i));
                 safe_create_dataset(mesh_group, "axis"+str(i), shape=(md[i].stop-md[i].start,), dtype='float64')
                 data_shape.append(md[i].stop-md[i].start)
 
@@ -96,7 +94,7 @@ class VSWriter(object):
                 if self.__type < 2:
                     derived_vars = safe_create_group(base, "derived_vars")
                     #derived_vars.attrs["vsType"] = np.string_("vsVars")
-                    kv.set_attrs(derived.name, "vsType", "vsVars");
+                    kv.set_attrs(derived_vars.name, "vsType", "vsVars");
 
                     tmp = "{"
                     for i in range(len(md)):
@@ -105,7 +103,7 @@ class VSWriter(object):
                             tmp += ", "
                     tmp += "}"
                     #derived_vars.attrs[self.__name] = np.string_(tmp)
-                    kv.set_attrs(derived.name, self.__name, tmp)
+                    kv.set_attrs(derived_vars.name, self.__name, tmp)
 
             if 'time' in base:
                 #test.attrs["vsTimeGroup"] = np.string_("/time")

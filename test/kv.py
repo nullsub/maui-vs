@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import hyperdex.client
-import hyperdex.admin
-
 import h5py as h5
 import numpy as np
-import os
 from maui.backend import context
+import os
 
+import hyperdex.client
 import time 
 import functools 
 import argparse
@@ -39,10 +37,9 @@ def set_attrs(group_name, name, value):
 	global last_put
 	if(not kv_writer):
 		return
-	key = str(group_name) + "/" + str(name)
 	if(last_put is not None):
 		last_put.wait()
-	last_put = client.async_put(spacename, key, {'value': str(value)})
+	last_put = client.async_put(spacename, str(group_name) + "/" + name, {'value': str(value)})
 
 @timeit
 def flush(hdf5_base):
