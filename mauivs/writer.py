@@ -5,6 +5,7 @@ from __future__ import division
 __author__ = 'christoph.statz <at> tu-dresden.de'
 
 import numpy as np
+from maui.backend import context
 from .helper import *
 import kv
 
@@ -42,14 +43,14 @@ class VSWriter(object):
             keys = self.__meta_data.keys()
 
         for key in keys:
-
             md = self.__meta_data[key]
 
             dom_string = ""
             for i in key:
+                dom_string += "_"
                 dom_string += str(i)
 
-            base_name = self.__name+""+dom_string
+            base_name = self.__name+dom_string
             var_group = safe_create_group(base, base_name)
             mesh_group = safe_create_group(var_group, "mesh")
 
@@ -71,7 +72,7 @@ class VSWriter(object):
             for i in range(len(md)):
                 #mesh_group.attrs["vsAxis"+str(i)] = np.string_("axis"+str(i))
                 kv.set_attrs(mesh_group.name, "vsAxis"+str(i), "axis"+str(i));
-                safe_create_dataset(mesh_group, "axis"+str(i), shape=(md[i].stop-md[i].start,), dtype='float64')
+                ds = safe_create_dataset(mesh_group, "axis"+str(i), shape=(md[i].stop-md[i].start,), dtype='float64')
                 data_shape.append(md[i].stop-md[i].start)
 
             # Compute shape for mesh datasets
@@ -133,6 +134,8 @@ class VSWriter(object):
                     datasets[key][:] = self.__data[key][:]
             else:
                 datasets[key][:] = self.__data[key][:]
+        if hasattr(context, 'comm'):
+            context.comm.Barrier()
 
         # delete groups and datasets before closing the file!
         for d in datasets.values():
@@ -166,4 +169,3 @@ class VSWriter(object):
             del mesh_groups
         except UnboundLocalError:
             pass
-

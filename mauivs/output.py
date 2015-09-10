@@ -172,4 +172,5 @@ class VSOutput(object):
                 writer.write(base, base_name)
   
             base.close()
+            del base
             kv.finalize(filename)
