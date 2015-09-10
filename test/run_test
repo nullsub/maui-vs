@@ -3,6 +3,7 @@ module purge
 module load /lustre/scratch2/p_roscon_pub/modules/modulefiles/python-extras/20150821
 
 export PYTHONPATH=/home/s3066193/.local/lib/python2.7/site-packages
-
 COORDINATOR_ID=`cat /lustre/scratch2/s3066193/hyperdexdata/coordinator_id`
+hyperdex rm-space -h $COORDINATOR_ID -p 1982 kv0
+hyperdex rm-space -h $COORDINATOR_ID -p 1982 kv1
 srun python2.7 kv_test.py --kv_coordinator=$COORDINATOR_ID

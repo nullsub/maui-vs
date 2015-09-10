@@ -172,6 +172,4 @@ class VSOutput(object):
                 writer.write(base, base_name)
   
             base.close()
-            if(context.rank == 0):
-                base = h5.File(filename+'.vsh5', 'r+', driver='sec2')
-		kv.finalize(base)
+            kv.finalize(filename)

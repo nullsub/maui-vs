@@ -14,4 +14,5 @@ a_group = h5.Group.create_group(base, "abc")
 kv.set_attrs(a_group.name, "vsType1", str.encode("utf8"))
 a_group = h5.Group.create_group(base, "qabc")
 kv.set_attrs(a_group.name, "vsType1", str.encode("utf8"))
-kv.finalize(base)
+base.close
+kv.finalize("file")
