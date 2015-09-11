@@ -34,13 +34,13 @@ last_put = None
 if(not hasattr(context, 'comm' ) or context.rank == 0):
 	kv_writer = True
 	print("connecting to coordinator: " + args.kv_coordinator)
-	#print("kv-flush-sec2")
+	print("kv-flush-sec2")
 	#print("kv-thread")
-	print("kv-no-flush")
+	#print("kv-no-flush")
 	client = hyperdex.client.Client(args.kv_coordinator, 1982)
-	client.group_del(spacename + str(space_count), {})
 	#admin = hyperdex.admin.Admin(args.kv_coordinator, 1982)
-	#admin.add_space("space " + spacename + str(space_count) + " key name attributes value tolerate 0 failures")
+	#admin.add_space("space " + spacename + str(i) + " key name attributes value tolerate 0 failures")
+	client.group_del(spacename + str(space_count), {})
 
 def set_attrs(group_name, name, value):
 	global last_put
@@ -56,20 +56,23 @@ def flush(filename, space):
 	h5_base = h5.File(filename+'.vsh5', 'r+', driver='sec2')
 	for x in client.search(space, {}):
 		the_set = h5_base.get(os.path.dirname(x['name']))
+		if the_set is None:
+	#		print "rank is " + str(context.rank) + ", filename: " + filename + " is none for: " , x
+			continue
 		the_set.attrs[os.path.basename(x['name'])] = np.string_(x['value'])
 	h5_base.close()
 
 def finalize(filename):
 	global space_count
 	global last_put
-	if(hasattr(context, 'comm' ) and context.rank is not 0):
-		return
-	del_group = client.async_group_del(spacename + str(space_count+1), {})
+	if not hasattr(context, 'comm' ) or context.rank is 0:
+		del_group = client.async_group_del(spacename + str(space_count+1), {})
 	if(last_put is not None):
 		last_put.wait()
 		last_put = None
 	#flush(filename, spacename + str(space_count))
 	#f = threading.Thread(name='flush'+str(space_count), target=flush, args=(filename, spacename + str(space_count)))
 	#f.start()
-	space_count += 1
-	del_group.wait()
+	if not hasattr(context, 'comm' ) or context.rank is 0:
+		space_count += 1
+		del_group.wait()

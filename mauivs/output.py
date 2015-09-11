@@ -173,4 +173,5 @@ class VSOutput(object):
   
             base.close()
             del base
-            kv.finalize(filename)
+            if not hasattr(context, 'comm') or self.__local_only or context.rank is 0:
+                kv.finalize(filename)
